@@ -117,6 +117,3 @@ Server listens on `http://localhost:3000`. Open in two tabs (or two devices on t
 3. Run the app locally; test with two clients (e.g. two tabs) for draw and clear.
 4. Submit a PR with a short description and reference any issue. One logical change per PR.
 
-## License
-
-ISC.
