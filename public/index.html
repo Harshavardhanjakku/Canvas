@@ -4,22 +4,53 @@
   <meta charset="UTF-8" />
   <title>Collaborative Whiteboard</title>
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
+  <!-- Toolbar -->
   <div class="toolbar">
-    <input type="color" id="colorPicker" value="#000000" />
+    <input
+      type="color"
+      id="colorPicker"
+      class="color-picker"
+      title="Pick color"
+    />
 
-    <input type="range" id="thickness" min="1" max="20" value="3" />
+    <input
+      type="range"
+      id="thickness"
+      class="thickness"
+      min="1"
+      max="20"
+      value="3"
+      title="Brush size"
+    />
 
-    <button id="penBtn">Pen</button>
-    <button id="eraserBtn">Eraser</button>
-    <button id="clearBtn">Clear Board</button>
+    <button id="penBtn" class="tool-btn active" title="Pen">
+      <i data-lucide="pen"></i>
+    </button>
+
+    <button id="eraserBtn" class="tool-btn" title="Eraser">
+      <i data-lucide="eraser"></i>
+    </button>
+
+    <button id="clearBtn" class="tool-btn clear" title="Clear board">
+      <i data-lucide="trash-2"></i>
+    </button>
   </div>
 
+  <!-- Canvas -->
   <canvas id="board"></canvas>
 
+  <!-- Scripts -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="script.js"></script>
+
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
 </html>

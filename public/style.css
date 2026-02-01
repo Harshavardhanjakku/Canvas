@@ -1,0 +1,118 @@
+/* =====================
+   CSS RESET & BASE
+===================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  :root {
+    --bg: #0b0f1a;
+    --panel: rgba(255, 255, 255, 0.08);
+    --panel-border: rgba(255, 255, 255, 0.15);
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --primary: #3b82f6;
+    --danger: #ef4444;
+    --radius: 14px;
+    --blur: blur(14px);
+  }
+  
+  html, body {
+    height: 100%;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at top, #111827, #020617);
+    color: var(--text);
+    overflow: hidden;
+  }
+  
+  /* =====================
+     TOOLBAR
+  ===================== */
+  .toolbar {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--panel);
+    backdrop-filter: var(--blur);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+  }
+  
+  /* =====================
+     BUTTONS
+  ===================== */
+  .tool-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 40px;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .tool-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  .tool-btn.active {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: var(--primary);
+  }
+  
+  /* =====================
+     COLOR PICKER
+  ===================== */
+  .color-picker {
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid var(--panel-border);
+    background: transparent;
+    cursor: pointer;
+  }
+  
+  /* =====================
+     RANGE SLIDER
+  ===================== */
+  .thickness {
+    width: 110px;
+    accent-color: var(--primary);
+  }
+  
+  /* =====================
+     DANGER BUTTON
+  ===================== */
+  .clear {
+    color: var(--danger);
+  }
+  
+  .clear:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+  
+  /* =====================
+     CANVAS
+  ===================== */
+  canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    background: #ffffff;
+    cursor: crosshair;
+  }
+  

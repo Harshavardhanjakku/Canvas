@@ -1,8 +1,11 @@
+// ------------------------
+// DOM & Canvas setup
 const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
-
 const toolbar = document.querySelector(".toolbar");
 
+// ------------------------
+// Drawing state
 let drawing = false;
 let lastX = 0;
 let lastY = 0;
@@ -11,9 +14,9 @@ let color = document.getElementById("colorPicker").value;
 let thickness = document.getElementById("thickness").value;
 let tool = "pen";
 
+// ------------------------
+// Socket.IO
 const socket = io();
-
-// Room ID from URL
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get("room") || "default";
 
@@ -41,27 +44,39 @@ document.getElementById("thickness").oninput = (e) => thickness = e.target.value
 
 document.getElementById("penBtn").onclick = () => tool = "pen";
 document.getElementById("eraserBtn").onclick = () => tool = "eraser";
-
 document.getElementById("clearBtn").onclick = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   socket.emit("clear-board");
 };
 
 // ------------------------
-// Mouse events
+// Helper: get proper canvas coordinates
+function getCanvasPos(clientX, clientY) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: clientX - rect.left,
+    y: clientY - rect.top
+  };
+}
+
+// ------------------------
+// Mouse Events (Desktop)
 canvas.addEventListener("mousedown", (e) => {
+  const pos = getCanvasPos(e.clientX, e.clientY);
   drawing = true;
-  [lastX, lastY] = [e.offsetX, e.offsetY];
+  lastX = pos.x;
+  lastY = pos.y;
 });
 
 canvas.addEventListener("mousemove", (e) => {
   if (!drawing) return;
+  const pos = getCanvasPos(e.clientX, e.clientY);
 
   const data = {
     x1: lastX,
     y1: lastY,
-    x2: e.offsetX,
-    y2: e.offsetY,
+    x2: pos.x,
+    y2: pos.y,
     color,
     thickness,
     tool
@@ -70,32 +85,33 @@ canvas.addEventListener("mousemove", (e) => {
   drawLine(data);
   socket.emit("draw", data);
 
-  [lastX, lastY] = [e.offsetX, e.offsetY];
+  lastX = pos.x;
+  lastY = pos.y;
 });
 
 canvas.addEventListener("mouseup", () => drawing = false);
 canvas.addEventListener("mouseout", () => drawing = false);
 
 // ------------------------
-// Touch events
+// Touch Events (Mobile)
 canvas.addEventListener("touchstart", (e) => {
   e.preventDefault();
-  const touch = e.touches[0];
+  const pos = getCanvasPos(e.touches[0].clientX, e.touches[0].clientY);
   drawing = true;
-  lastX = touch.clientX;
-  lastY = touch.clientY;
+  lastX = pos.x;
+  lastY = pos.y;
 });
 
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
   if (!drawing) return;
+  const pos = getCanvasPos(e.touches[0].clientX, e.touches[0].clientY);
 
-  const touch = e.touches[0];
   const data = {
     x1: lastX,
     y1: lastY,
-    x2: touch.clientX,
-    y2: touch.clientY,
+    x2: pos.x,
+    y2: pos.y,
     color,
     thickness,
     tool
@@ -104,8 +120,8 @@ canvas.addEventListener("touchmove", (e) => {
   drawLine(data);
   socket.emit("draw", data);
 
-  lastX = touch.clientX;
-  lastY = touch.clientY;
+  lastX = pos.x;
+  lastY = pos.y;
 });
 
 canvas.addEventListener("touchend", () => drawing = false);
