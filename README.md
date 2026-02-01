@@ -73,7 +73,7 @@ Flow: user input → client canvas + Socket emit → server relay by room → ot
 ### Local
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/canvas.git
+git clone https://github.com/Harshavardhanjakku/Canvas.git
 cd canvas
 npm install
 npm start
