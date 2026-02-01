@@ -1,8 +1,15 @@
 const canvas = document.getElementById("board");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight - 60;
+const toolbar = document.querySelector(".toolbar");
+
+let drawing = false;
+let lastX = 0;
+let lastY = 0;
+
+let color = document.getElementById("colorPicker").value;
+let thickness = document.getElementById("thickness").value;
+let tool = "pen";
 
 const socket = io();
 
@@ -17,15 +24,17 @@ socket.on("room-full", () => {
   window.location.reload();
 });
 
-// Drawing state
-let drawing = false;
-let lastX = 0;
-let lastY = 0;
+// ------------------------
+// Responsive canvas
+function resizeCanvas() {
+  const toolbarHeight = toolbar.offsetHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - toolbarHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
-let color = document.getElementById("colorPicker").value;
-let thickness = document.getElementById("thickness").value;
-let tool = "pen";
-
+// ------------------------
 // UI controls
 document.getElementById("colorPicker").onchange = (e) => color = e.target.value;
 document.getElementById("thickness").oninput = (e) => thickness = e.target.value;
@@ -38,14 +47,12 @@ document.getElementById("clearBtn").onclick = () => {
   socket.emit("clear-board");
 };
 
+// ------------------------
 // Mouse events
 canvas.addEventListener("mousedown", (e) => {
   drawing = true;
   [lastX, lastY] = [e.offsetX, e.offsetY];
 });
-
-canvas.addEventListener("mouseup", () => drawing = false);
-canvas.addEventListener("mouseout", () => drawing = false);
 
 canvas.addEventListener("mousemove", (e) => {
   if (!drawing) return;
@@ -66,12 +73,50 @@ canvas.addEventListener("mousemove", (e) => {
   [lastX, lastY] = [e.offsetX, e.offsetY];
 });
 
-// Draw function
+canvas.addEventListener("mouseup", () => drawing = false);
+canvas.addEventListener("mouseout", () => drawing = false);
+
+// ------------------------
+// Touch events
+canvas.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  drawing = true;
+  lastX = touch.clientX;
+  lastY = touch.clientY;
+});
+
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+  if (!drawing) return;
+
+  const touch = e.touches[0];
+  const data = {
+    x1: lastX,
+    y1: lastY,
+    x2: touch.clientX,
+    y2: touch.clientY,
+    color,
+    thickness,
+    tool
+  };
+
+  drawLine(data);
+  socket.emit("draw", data);
+
+  lastX = touch.clientX;
+  lastY = touch.clientY;
+});
+
+canvas.addEventListener("touchend", () => drawing = false);
+canvas.addEventListener("touchcancel", () => drawing = false);
+
+// ------------------------
+// Draw line function
 function drawLine({ x1, y1, x2, y2, color, thickness, tool }) {
   ctx.beginPath();
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
-
   ctx.lineWidth = thickness;
   ctx.lineCap = "round";
 
@@ -87,12 +132,7 @@ function drawLine({ x1, y1, x2, y2, color, thickness, tool }) {
   ctx.closePath();
 }
 
-// Receive drawing
-socket.on("draw", (data) => {
-  drawLine(data);
-});
-
-// Clear board for all
-socket.on("clear-board", () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-});
+// ------------------------
+// Socket.IO receive events
+socket.on("draw", (data) => drawLine(data));
+socket.on("clear-board", () => ctx.clearRect(0, 0, canvas.width, canvas.height));
